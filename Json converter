@@ -1,0 +1,37 @@
+import json
+import mysql.connector
+
+host = "localhost"
+user = "root"
+password = "12345"
+database = "sakila"
+
+try:
+    conn = mysql.connector.connect(  # Establish database connection
+        host=host,
+        user=user,
+        password=password,
+        database=database
+    )
+    cursor = conn.cursor(dictionary=True)  # Use dictionary cursor for easier JSON conversion
+
+   
+    sql = "select * from actor;" 
+    cursor.execute(sql)  # Execute SQL query
+    results = cursor.fetchall()
+    json_data = json.dumps(results, indent=4)  # Convert results to JSON 
+    with open("result.json", "w") as outfile:  # Write JSON data to file 
+        outfile.write(json_data)
+
+    print("Data successfully exported to result.json")
+
+except mysql.connector.Error as error:
+    print(f"Error connecting to or querying MySQL: {error}")
+except Exception as e: # Catching other potential exceptions
+    print(f"An unexpected error occurred: {e}")
+finally:
+    # Ensure connection is closed even if errors occur
+    if conn.is_connected():
+        cursor.close()
+        conn.close()
+        print("MySQL connection closed.")
